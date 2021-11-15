@@ -51,7 +51,10 @@ Piping a command directly to ```bash``` is controversial, as it prevents the
 user from reading code that is about to run on their system. If you are worried
 about the contents of the installer, please examine the [first](https://raw.githubusercontent.com/peted-davis/peted-davis.github.io/master/wfpiconsole)
 and [second](https://raw.githubusercontent.com/peted-davis/WeatherFlow_PiConsole/master/wfpiconsole.sh)
-install files in the Git repository before running the install command.
+install files in the Git repository before running the install command. The
+PiConsole requires a number of Python dependencies. Please check the second 
+install file if you think there may be any conflicts with existing software on 
+your on system.
 
 ### Raspberry Pi 4
 
@@ -183,6 +186,6 @@ PiConsole" in the **[Installation Instructions](#installation-instructions)**.
 
 Many of the graphical elements in the console are based on the Weather34 Home
 Weather Station Template (https://www.weather34.com/homeweatherstation/)
-copyright 2015-2020 Brian Underdown. The Weather34 Home Weather Station Template
+copyright 2015-2021 Brian Underdown. The Weather34 Home Weather Station Template
 is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
 International License.

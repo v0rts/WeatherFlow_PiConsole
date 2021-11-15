@@ -1,6 +1,6 @@
 ## WeatherFlow PiConsole: Raspberry Pi Python console for WeatherFlow Tempest
 ## and Smart Home Weather stations.
-## Copyright (C) 2018-2020 Peter Davis
+## Copyright (C) 2018-2021 Peter Davis
 
 ## This program is free software: you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,9 @@
 ## CUSTOM PanelButton AND MenuButton
 ## =============================================================================
 <PanelButton@Button>:
-    font_size: self.height/2
+    font_size: dp(15.5*app.scaleFactor)
+    font_name: 'fonts/Inter-SemiBold.ttf'
+    color: utils.rgba('#d6d6d6ff')
     background_color: (0,0,0,0)
     canvas.before:
         Color:
@@ -28,11 +30,11 @@
             pos: self.pos
             size: self.size
             radius: [14*app.scaleFactor]
-    font_name: 'fonts/Inter-SemiBold.ttf'
-    color: utils.rgba('#d6d6d6ff')
 
 <MenuButton>:
-    font_size: self.height/2
+    font_size: dp(15.5*app.scaleFactor)
+    font_name: 'fonts/Inter-SemiBold.ttf'
+    color: utils.rgba('#d6d6d6ff')
     background_color: (0,0,0,0)
     canvas.before:
         Color:
@@ -41,8 +43,6 @@
             pos: self.pos
             size: self.size
             radius: [14*app.scaleFactor]
-    font_name: 'fonts/Inter-SemiBold.ttf'
-    color: utils.rgba('#d6d6d6ff')
 
 ## =============================================================================
 ## CUSTOM TabbedPanelItem AND MainMenuLayout
@@ -51,7 +51,7 @@
     background_normal: 'atlas://atlas/wfpiconsole/tab_btn'
     background_down: 'atlas://atlas/wfpiconsole/tab_btn_pressed'
     font_name: 'fonts/Inter-SemiBold.ttf'
-    font_size: self.height/2.8
+    font_size: dp(14.2*app.scaleFactor)
     canvas.after:
         Color:
             rgb: [.3,.3,.3,1]
@@ -85,7 +85,7 @@
             size: self.size
             radius: (app.scaleFactor*2, app.scaleFactor*2)
         Color:
-            rgba: utils.rgba('141414ff')
+            rgba: utils.rgba('000000ff')
         Rectangle:
             pos: self.x+dp(app.scaleFactor), self.y+dp(app.scaleFactor)
             size: self.width-dp(app.scaleFactor*2), self.height-dp(app.scaleFactor*2)
@@ -106,7 +106,7 @@
             size: self.size
             radius: (app.scaleFactor*2, app.scaleFactor*2)
         Color:
-            rgba: utils.rgba('141414ff')
+            rgba: utils.rgba('000000ff')
         Rectangle:
             pos: self.x+dp(app.scaleFactor), self.y+dp(app.scaleFactor)
             size: self.width-dp(app.scaleFactor*2), self.height-dp(app.scaleFactor*2)

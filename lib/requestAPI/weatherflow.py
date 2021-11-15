@@ -1,6 +1,6 @@
 """ Returns WeatherFlow API requests required by the Raspberry Pi Python console
 for WeatherFlow Tempest and Smart Home Weather stations.
-Copyright (C) 2018-2020 Peter Davis
+Copyright (C) 2018-2021 Peter Davis
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,7 @@ def Last3h(Device,endTime,Config):
     startTime = endTime - int(3600*3)
 
     # Download WeatherFlow data for last three hours
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -96,7 +96,7 @@ def Last6h(Device,endTime,Config):
     startTime = endTime - int(3600*6)
 
     # Download WeatherFlow data for last three hours
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -113,7 +113,7 @@ def Last24h(Device,endTime,Config):
 
     INPUTS:
         Device              Device ID
-        endTime             End time of six hour window as a UNIX timestamp
+        endTime             End time of 24 hour window as a UNIX timestamp
         Config              Station configuration
 
     OUTPUT:
@@ -124,7 +124,7 @@ def Last24h(Device,endTime,Config):
     startTime = endTime - int(3600*24)
 
     # Download WeatherFlow data for last three hours
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -160,7 +160,7 @@ def Today(Device,Config):
     endTime = int(Now.timestamp())
 
     # Download WeatherFlow data
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -198,7 +198,7 @@ def Yesterday(Device,Config):
     endTime = int(Today.timestamp())-1
 
     # Download WeatherFlow data
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -227,14 +227,23 @@ def Month(Device,Config):
 
     # Convert start of current month in Station timezone to start of
     # current month in UTC. Convert UTC time into UNIX timestamp
-    startTime = int(Tz.localize(datetime(Now.year,Now.month,1)).timestamp())
+    monthStart = Tz.localize(datetime(Now.year, Now.month, 1))
+    startTime  = int(monthStart.timestamp())
 
-    # Convert midnight today in Station timezone to midnight today in
-    # UTC. Convert UTC time into UNIX timestamp.
-    endTime = int(Tz.localize(datetime(Now.year,Now.month,Now.day)).timestamp())-1
+    # If today is not the first day of the month, convert midnight yesterday
+    # in Station timezone to midnight yesterday in UTC. Convert UTC time into
+    # UNIX timestamp.
+    if Now.day != 1:
+        Yesterday = Tz.localize(datetime(Now.year, Now.month, Now.day)) - timedelta(days=1)
+        endTime = int(Yesterday.timestamp()) - 1
+
+    # If today is the first day of the month, set the endTime to one second
+    # less than the startTime
+    else:
+        endTime = startTime - 1
 
     # Download WeatherFlow data
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?bucket=e&time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -263,14 +272,16 @@ def Year(Device,Config):
 
     # Convert start of current year in Station timezone to start of current year
     # in UTC. Convert UTC time into time timestamp
-    startTime = int(Tz.localize(datetime(Now.year,1,1)).timestamp())
+    yearStart = Tz.localize(datetime(Now.year, 1, 1))
+    startTime = int(yearStart.timestamp())
 
-    # Convert midnight today in Station timezone to midnight today in
+    # Convert midnight yesterday in Station timezone to midnight yesterday in
     # UTC. Convert UTC time into UNIX timestamp.
-    endTime = int(Tz.localize(datetime(Now.year,Now.month,Now.day)).timestamp())-1
+    yearEnd = Tz.localize(datetime(Now.year, Now.month, Now.day)) - timedelta(days=1)
+    endTime = int(yearEnd.timestamp()) - 1
 
     # Download WeatherFlow data
-    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?time_start={}&time_end={}&api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/observations/device/{}?bucket=e&time_start={}&time_end={}&token={}'
     URL = Template.format(Device,startTime,endTime,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -294,7 +305,7 @@ def stationMetaData(Station,Config):
     """
 
     # Download station meta data
-    Template = 'https://swd.weatherflow.com/swd/rest/stations/{}?api_key={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/stations/{}?token={}'
     URL = Template.format(Station,Config['Keys']['WeatherFlow'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
@@ -316,7 +327,7 @@ def Forecast(Config):
     """
 
     # Download WeatherFlow forecast
-    Template = 'https://swd.weatherflow.com/swd/rest/better_forecast?api_key={}&station_id={}&lat={}&lon={}'
+    Template = 'https://swd.weatherflow.com/swd/rest/better_forecast?token={}&station_id={}&lat={}&lon={}'
     URL = Template.format(Config['Keys']['WeatherFlow'],Config['Station']['StationID'],Config['Station']['Latitude'],Config['Station']['Longitude'])
     try:
         Data = requests.get(URL,timeout=int(Config['System']['Timeout']))
