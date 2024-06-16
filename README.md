@@ -2,9 +2,6 @@
 
 <a href="https://www.buymeacoffee.com/peted.davis" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-**PLEASE NOTE: no support is available until late January 2024 as the developer
-is working in Antarctica with no access to the internet**
-
 The WeatherFlow PiConsole is a Python console that displays the data collected
 by a WeatherFlow Tempest or Smart Home Weather Station. The console uses either
 the WeatherFlow REST API and websocket service or the local UDP connection to
@@ -30,7 +27,9 @@ https://community.weatherflow.com/
 **[Installation Instructions](#installation-instructions)**<br>
 **[Update Instructions](#update-instructions)**<br>
 **[Auto-Start Instructions](#auto-start-instructions)**<br>
-**[Advanced Installation: Windows](#advanced-installation-windows)**<br>
+**[Advanced: Custom Panels](#advanced-custom-panels)**<br>
+**[Advanced: Device Replacement](#advanced-device-replacement)**<br>
+**[Advanced: Windows Installation](#advanced-installation-windows)**<br>
 **[Credits](#credits)**<br>
 
 ## Compatibility
@@ -179,6 +178,59 @@ stop command or a hard shutdown:
 ```
 wfpiconsole stop
 ```
+
+## Advanced: Custom Panels
+
+The console is distributed with 7 built-in panels to display weather, forecast
+and astronomical information. For advanced users, custom panels can be created
+allowing the data display to be customised, or additional data sources to be 
+integrated into the console. Custom panels should not be overwritten when the 
+console is updated.
+
+The custom panel templates are contained within the `~\wfpiconsole\user` folder. 
+To use the custom panel feature, you first need to rename `customPanels.kv.tmpl` 
+to `customPanels.kv` and `customPanels.py.tmpl` to `customPanels.py`. An example 
+panel called "BigTemperature" is included as an example, and will be loaded the 
+next time you start the console.
+
+In the `customPanels.py` file you must create two classes per custom panel called: 
+`[panel_name]Panel` and `[panel_name]Button`. "panel_name" can be whatever you want, 
+but you must add the two classes that end with Panel and Button per custom panel. 
+The classes should be empty (just add pass under the class name), unless you want 
+to add methods to your custom panel to control its behaviour. The classes required
+for the "BigTemperature" panel can be used as examples. 
+
+In the `customPanels.kv` file you can define the layout of the panel. You need to 
+add the two class names that you defined in `customPanels.py` surrounded by left and 
+right angled brackets: <>. Again, you can see the "BigTemperature" panel in 
+`customPanels.kv.tmpl` as an example. For the Button class, you can change the text 
+attribute under PanelButton: to set the name of the panel that will be displayed in 
+the bottom bar of the PiConsole. Otherwise leave this class unchanged. For the Panel 
+class, the panel title is defined by the _title attribute under PanelTitle:. This can 
+be different to the name of the panel that is displayed in the bottom bar. Otherwise 
+you are free to define the layout however you want using in-built or custom Kivy 
+widgets (https://kivy.org/doc/stable/api-kivy.uix.html).
+
+## Advanced: Device Replacement
+
+Occasionally it may be necessary to replace your Tempest device due to hardware
+failure. Depending on how the replacement Tempest is added to your existing station,
+the Tempest device ID and serial number may change. If this is the case, the
+`wfpiconsole.ini` file needs to be updated with the new device ID and serial number.
+The `.ini` file can either be edited directly, or if  you are not comfortable editing 
+the `.ini` file, you can delete it and then restart the console. You will be taken
+through the steps to generate a new `.ini` file with the updated device ID and serial
+number. 
+
+When a device is replaced, the total monthly/yearly rain accumulation displayed in the
+console will also reset to zero as these fields are calculated directly from the 
+total rain accumuluation recorded by the new device (which is naturally zero as 
+the device is brand new). To retain the correct values, it is necessary to switch
+the console to use the Tempest Statistics API endpoint using `Menu` -> `Settings` -> 
+`System` -> `Statistics API endpoint`. By default this option is disbaled as it
+results in a small loss of accuracy through rounding errors. Therefore it is not 
+recommended for use unless you have replaced a device within the last calendar 
+year. At the end of a calendar year, the Statistics endoint can be switched off.  
 
 ## Advanced Installation: Windows
 
